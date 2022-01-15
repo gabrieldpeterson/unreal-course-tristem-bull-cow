@@ -62,7 +62,7 @@ void UBullCowCartridge::ProcessWrongGuess(const FString& Guess)
 
     if (!IsIsogram(Guess))
     {
-        PrintLine(TEXT("%s is not an isogram"), Guess);
+        PrintLine(TEXT("%s is not an isogram"), *Guess);
         return;
     }
 
@@ -77,7 +77,7 @@ void UBullCowCartridge::ProcessWrongGuess(const FString& Guess)
     }
 }
 
-bool UBullCowCartridge::IsIsogram(const FString& Word)
+bool UBullCowCartridge::IsIsogram(const FString& Word) const
 {
     for (int i = 0; i < Word.Len(); ++i)
     {
