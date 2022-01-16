@@ -2,6 +2,7 @@
 #include "BullCowCartridge.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Math/UnrealMathUtility.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
@@ -10,8 +11,6 @@ void UBullCowCartridge::BeginPlay() // When the game starts
     FFileHelper::LoadFileToStringArray(Words, *WordListPath);
 
     SetupGame();
-
-    PrintLine(TEXT("The hidden word is: %s"), *HiddenWord); // TODO delete, debug line
 }
 
 void UBullCowCartridge::OnInput(const FString& Input) // When the player hits enter
@@ -36,21 +35,21 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
     }
 }
 
-FString UBullCowCartridge::PickRandomWord(TArray<FString> AllWords)
+FString UBullCowCartridge::PickRandomWord(const TArray<FString>& AllWords) const
 {
     TArray<FString> ValidWords;
 
-    for (int i = 0; i < AllWords.Num(); i++)
+    for (FString WordToCheck : AllWords)
     {
-        if (AllWords[i].Len() >= 3 && AllWords[i].Len() <= 8 && IsIsogram(AllWords[i]))
+        if (WordToCheck.Len() >= 3 && WordToCheck.Len() <= 8 && IsIsogram(WordToCheck))
         {
-            ValidWords.Emplace(AllWords[i]);
+            ValidWords.Emplace(WordToCheck);
         }
     }
 
-    // TODO pick random word from ValidWords
+    int32 RandomWordIndex = FMath::RandRange(0, ValidWords.Num() - 1);
 
-    return TEXT("hat");
+    return TEXT("%s"), *ValidWords[RandomWordIndex];
 }
 
 void UBullCowCartridge::SetupGame()
@@ -62,6 +61,7 @@ void UBullCowCartridge::SetupGame()
     // Welcoming the player
     PrintLine(TEXT("Welcome to Bull Cows!"));
     PrintLine(TEXT("Guess the %i letter word."), HiddenWord.Len());
+    PrintLine(TEXT("Debug: %s"), *HiddenWord);
     PrintLine(TEXT("Type in your guess.\nPress enter to continue..."));
 }
 
