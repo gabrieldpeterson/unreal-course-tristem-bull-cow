@@ -2,7 +2,6 @@
 #include "BullCowCartridge.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
-#include "Math/UnrealMathUtility.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
@@ -54,14 +53,14 @@ FString UBullCowCartridge::PickRandomWord(const TArray<FString>& AllWords) const
 
 void UBullCowCartridge::SetupGame()
 {
-    HiddenWord = PickRandomWord(Words); // TODO make dynamic
+    HiddenWord = PickRandomWord(Words); 
     Lives = HiddenWord.Len();
     bGameOver = false;
 
     // Welcoming the player
     PrintLine(TEXT("Welcome to Bull Cows!"));
     PrintLine(TEXT("Guess the %i letter word."), HiddenWord.Len());
-    PrintLine(TEXT("Debug: %s"), *HiddenWord);
+    PrintLine(TEXT("Debug: %s"), *HiddenWord);  // TODO: delete when finished, for debugging
     PrintLine(TEXT("Type in your guess.\nPress enter to continue..."));
 }
 
@@ -89,6 +88,10 @@ void UBullCowCartridge::ProcessWrongGuess(const FString& Guess)
 
     PrintLine(TEXT("You have lost a life."));
     PrintLine(TEXT("You have %i lives left"), --Lives);
+    // Show the bulls and cows
+    int32 Bulls, Cows;
+    GetBullCows(Guess, Bulls, Cows);
+    PrintLine(TEXT("You have %i Bulls and %i Cows"), Bulls, Cows);
 
     if (Lives == 0)
     {
@@ -111,4 +114,28 @@ bool UBullCowCartridge::IsIsogram(const FString& Word) const
         }
     }
     return true;
+}
+
+void UBullCowCartridge::GetBullCows(const FString& Guess, int32& BullCount, int32& CowCount) const
+{
+    BullCount = 0;
+    CowCount = 0;
+
+    for (int32 i = 0; i < Guess.Len(); i++)
+    {
+        if (Guess[i] == HiddenWord[i])
+        {
+            BullCount++;
+        }
+        else
+        {
+            for (int32 j = 0; j < Guess.Len(); j++)
+            {
+                if (Guess[i] == HiddenWord[j])
+                {
+                    CowCount++;
+                }
+            }
+        }
+    }
 }
