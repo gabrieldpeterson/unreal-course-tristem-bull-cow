@@ -1,10 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "BullCowCartridge.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
 
 void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
-    
+    const FString WordListPath = FPaths::ProjectContentDir() / TEXT("WordLists/HiddenWordList.txt");
+    FFileHelper::LoadFileToStringArray(Words, *WordListPath);
+
     SetupGame();
 
     PrintLine(TEXT("The hidden word is: %s"), *HiddenWord); // TODO delete, debug line
@@ -32,9 +36,26 @@ void UBullCowCartridge::OnInput(const FString& Input) // When the player hits en
     }
 }
 
+FString UBullCowCartridge::PickRandomWord(TArray<FString> AllWords)
+{
+    TArray<FString> ValidWords;
+
+    for (int i = 0; i < AllWords.Num(); i++)
+    {
+        if (AllWords[i].Len() >= 3 && AllWords[i].Len() <= 8 && IsIsogram(AllWords[i]))
+        {
+            ValidWords.Emplace(AllWords[i]);
+        }
+    }
+
+    // TODO pick random word from ValidWords
+
+    return TEXT("hat");
+}
+
 void UBullCowCartridge::SetupGame()
 {
-    HiddenWord = TEXT("cake"); // TODO make dynamic
+    HiddenWord = PickRandomWord(Words); // TODO make dynamic
     Lives = HiddenWord.Len();
     bGameOver = false;
 
@@ -79,9 +100,9 @@ void UBullCowCartridge::ProcessWrongGuess(const FString& Guess)
 
 bool UBullCowCartridge::IsIsogram(const FString& Word) const
 {
-    for (int i = 0; i < Word.Len(); ++i)
+    for (int32 i = 0; i < Word.Len(); ++i)
     {
-        for (int j = i + 1; j < Word.Len(); ++j)
+        for (int32 j = i + 1; j < Word.Len(); ++j)
         {
             if (Word[i] == Word[j])
             {
